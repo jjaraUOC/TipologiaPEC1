@@ -1,5 +1,6 @@
 import csv
-import time
+import os
+import datetime
 from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -7,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 
 def scrapWeb(url):
     browser.get(url)
-    soup = BeautifulSoup(browser.page_source,"html5lib")
+    soup = BeautifulSoup(browser.page_source,"html.parser")
     return soup
 
 def coinHistorical(url_historical):
@@ -25,10 +26,10 @@ def coinHistorical(url_historical):
             Close = cell[4].find(text=True)
             Volumen = cell[5].find(text=True)
             Market_Cap = cell[6].find(text=True)
-            
-            coins = [Fecha, Open, High, Low, Close, volumen, Market_Cap]
+            coins = [Fecha, Open, High, Low, Close, Volumen, Market_Cap]
             coinlist.append(coins)
-            
+    return coinlist
+
 def mdy_to_ymd(d):
      return datetime.strptime(d, '%b %d, %Y').strftime('%d/%m/%Y')    
 
@@ -37,35 +38,42 @@ def queryCoins(url):
     soup = scrapWeb(url)
     table = soup.find("table")
     count = 0
+    link_coin = ""
+    coinName = ""
     for row in table.findAll("tr"):
         count = count + 1
-        for cell in row.findAll("td"):
+        coins = row.findAll("td")
+        for cell in coins:
             if count <= 10:
-                item_ref = cell.find('div', {"class": "sc-AxhCb bXGzHn"})        
+                item_ref = cell.find('div', {"class": "sc-AxhCb bXGzHn"})
                 if (item_ref is not None):
                     item = item_ref.find('a')
                     link_coin = "https://coinmarketcap.com" + item['href'] + "historical-data"
-                    coinHistorical(link_coin)
             else:
-                item_ref_2 = cell.find('a')
-                if item_ref_2 is not None:          
-                    link_coin_2 = "https://coinmarketcap.com" + item_ref_2['href'] + "historical-data"
-                    print(link_coin_2)
+                item_ref = cell.find('a')
+                if item_ref is not None:
+                    link_coin = "https://coinmarketcap.com" + item_ref['href'] + "historical-data"
+        if(link_coin == ""): continue
+        coinName = coins[2].find(text=True)
+        writeCSV(coinHistorical(link_coin), coinName)
 
-def writeCSV(conlist):
+def writeCSV(coinhistory,coinname):
+    print("Escribiendo histórico de la criptomoneda " +coinname)
     currentDir = os.path.dirname(__file__)
-    filename = "coins_dataset.csv"
-    filePath = os.path.join(currentDir, filename)
+    date = datetime.today().strftime('%Y-%m-%d')
+    filename = coinname + "-" + date +" .txt"
+    filePath = os.path.join(currentDir, "CoinsCSV", filename)
     with open(filePath, 'w', newline='') as csvFile:
-    writer = csv.writer(csvFile)
-    for coin in coinlist:
-        writer.writerow(coin)
+        writer = csv.writer(csvFile)
+        for field in coinhistory:
+            writer.writerow(field)
 
 
 chrome_options = Options()
-chrome_options.add_argument("--headless")
-browser = webdriver.Chrome(executable_path="./chromedriver", options=chrome_options)     
-
+chrome_options.add_argument("--headless") ## Con esta linea nos aseguramos que el navegador de Chrome no abra una nueva pestaña.
+browser = webdriver.Chrome(executable_path="./chromedriver", options=chrome_options)
+if not os.path.exists('CoinsCSV'):
+    os.makedirs('CoinsCSV')
 queryCoins("https://coinmarketcap.com")
 
 
