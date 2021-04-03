@@ -5,6 +5,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import time
 
 def scrapWeb(url):
     browser.get(url)
@@ -56,6 +57,7 @@ def queryCoins(url):
         if(link_coin == ""): continue
         coinName = coins[2].find(text=True)
         writeCSV(coinHistorical(link_coin), coinName)
+        time.sleep(60)
 
 def writeCSV(coinhistory,coinname):
     print("Escribiendo histórico de la criptomoneda " +coinname)
