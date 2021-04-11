@@ -25,6 +25,9 @@ Previa a la ejecución del programa, es necesario instalar las siguientes depend
 **Html5lib**
 >pip install html5lib
 
+**Fake_useragent**
+>pip install fake_useragent
+
 Aparte de las dependencias, el sistema desde el que se ejecuta el script debe de tener instalado
 **Google Chrome (ver. 89)**. 
 
