@@ -5,12 +5,29 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from fake_useragent import UserAgent
 import time
 
-def scrapWeb(url): 
+""" Esta función se encarga abrir el enlace con la web para extraer el código
+    donde se encuentra la información."""
+
+def scrapWeb(url):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--window-size=1420,1080")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument(f'user-agent={UserAgent().random}')
+    browser = webdriver.Chrome(executable_path="./chromedriver", options=chrome_options)
     browser.get(url)
+    time.sleep(60)
+    browser.maximize_window()
     soup = BeautifulSoup(browser.page_source,"html.parser")
+    browser.close()
     return soup
+
+""" Esta función se encarga de extraer la información del historial de 
+    la criptomoneda y almacenarla en una lista. """
 
 def coinHistorical(url_historical):
     headers = ["Fecha","Open", "High", "Low", "Close", "Volumen", "Market_Cap"]
@@ -31,9 +48,12 @@ def coinHistorical(url_historical):
             coinlist.append(coins)
     return coinlist
 
-def mdy_to_ymd(d):
-     return datetime.strptime(d, '%b %d, %Y').strftime('%d/%m/%Y')    
+# Transforma la fecha al formato dd/mm/yyyy.
 
+def mdy_to_ymd(d):
+     return datetime.strptime(d, '%b %d, %Y').strftime('%d/%m/%Y')
+
+"""Esta función se encarga de buscar los enlaces del historial de las criptomonedas de la página principal. """
 
 def queryCoins(url):
     soup = scrapWeb(url)
@@ -57,36 +77,22 @@ def queryCoins(url):
         if(link_coin == ""): continue
         coinName = coins[2].find(text=True)
         writeCSV(coinHistorical(link_coin), coinName)
-        time.sleep(60)
+
+# Esta función guarda el histórico de la criptomoneda en un archivo .CSV.
 
 def writeCSV(coinhistory,coinname):
     print("Escribiendo histórico de la criptomoneda " +coinname)
     currentDir = os.path.dirname(__file__)
     date = datetime.today().strftime('%Y-%m-%d')
-    filename = coinname + "-" + date +" .txt"
+    filename = coinname + "-" + date + ".csv"
     filePath = os.path.join(currentDir, "CoinsCSV", filename)
     with open(filePath, 'w', newline='') as csvFile:
         writer = csv.writer(csvFile)
         for field in coinhistory:
             writer.writerow(field)
 
+# Main del programa.
 
-chrome_options = Options()
-chrome_options.add_argument("--headless") ## Con esta linea nos aseguramos que el navegador de Chrome no abra una nueva pestaña.
-browser = webdriver.Chrome(executable_path="./chromedriver", options=chrome_options)
 if not os.path.exists('CoinsCSV'):
     os.makedirs('CoinsCSV')
 queryCoins("https://coinmarketcap.com")
-
-
-browser.close()
-
-
-
-
-    
-
-
-        
-   
-    
