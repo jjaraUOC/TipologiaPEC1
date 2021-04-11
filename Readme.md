@@ -1,6 +1,6 @@
 <H1>Extracción del histórico de criptomonedas mediante Web Scrapping</H1>
 
-El trabajo consiste en la extracción del histórico de las 50 criptomonedas más relevantes 
+El trabajo consiste en la extracción del histórico de las 100 criptomonedas más relevantes 
 de la web  [Coin Market Cap](https://coinmarketcap.com).
 
 Este histórico, será almacenado en un *.csv* (Comma Separated Values) para un posible análisis posterior.
