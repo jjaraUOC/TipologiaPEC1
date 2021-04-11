@@ -7,7 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 
-def scrapWeb(url):
+def scrapWeb(url): 
     browser.get(url)
     soup = BeautifulSoup(browser.page_source,"html.parser")
     return soup
