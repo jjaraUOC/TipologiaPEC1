@@ -1,1 +1,0 @@
-Fecha,Open,High,Low,Close,Volumen,Market_Cap
