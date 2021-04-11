@@ -3,7 +3,7 @@
 El trabajo consiste en la extracción del histórico de las 100 criptomonedas más relevantes 
 de la web  [Coin Market Cap](https://coinmarketcap.com).
 
-Este histórico, será almacenado en un *.csv* (Comma Separated Values) para un posible análisis posterior.
+Este histórico, será almacenado en un *.csv* por cada criptomoneda (Comma Separated Values) para un posible análisis posterior.
 
 
 <h3>Miembros del equipo</h3> 
